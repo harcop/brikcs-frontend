@@ -88,7 +88,7 @@ export default {
           this.$store.commit('setAuth')
           this.$store.commit('setToken', { token })
           this.$store.commit('setUserData', { userData: { userId } })
-          this.$router.push('/dashboard')
+          this.$router.push('/')
         })
         .catch((err) => {
           console.log(err)

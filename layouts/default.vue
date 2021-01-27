@@ -76,7 +76,7 @@ export default {
         {
           icon: 'mdi-apps',
           title: 'Dashboard',
-          to: '/dashboard'
+          to: '/'
         }
       ],
       miniVariant: false,

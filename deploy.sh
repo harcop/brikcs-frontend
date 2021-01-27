@@ -1,3 +1,3 @@
 git add .
-git commit -m "feat(): add front end"
-git push -u origin dev
+git commit -m "feat(): change index"
+git push
