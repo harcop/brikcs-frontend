@@ -1,3 +1,3 @@
 git add .
-git commit -m "feat(): change index"
+git commit -m "feat(): add brikcs interface"
 git push

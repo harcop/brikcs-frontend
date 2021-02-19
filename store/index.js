@@ -1,43 +1,54 @@
-import axios from 'axios'
 export const state = () => ({
-  counter: 50,
-  auth: {},
-  brand: {},
-  wallet: {}
+  authenticated: false,
+  userDetail: {},
+  token: '',
+  headers: {},
+  categoryId: '',
+  levelId: ''
 })
 
 export const mutations = {
-  increment (state) {
-    state.counter += 1
+  setUserDetail (state, { userDetail }) {
+    state.userDetail = userDetail
   },
-  setAuth (state) {
-    state.auth.authentication = true
+  setAuth (state, { token }) {
+    state.authenticated = true
+    state.token = token
+    state.headers = {
+      authorization: `Bearer ${token}`
+    }
   },
-  setToken (state, { token }) {
-    state.auth.token = token
+  setCategoryId (state, { categoryId }) {
+    state.categoryId = categoryId
   },
-  setUserData (state, { userData }) {
-    state.auth.userData = userData
+  setLevelId (state, { levelId }) {
+    state.levelId = levelId
   },
-  setBrand (state, { brand }) {
-    state.brand = brand
-  },
-  setWallet (state, { wallet }) {
-    state.wallet = wallet
+  removeAuth (state) {
+    state.authenticated = false
+    state.userDetail = {}
+    state.token = ''
+    state.headers = {}
   }
 }
 
 export const getters = {
-  getToken: (state) => {
-    return state.auth.token
+  getAuth (state) {
+    return state.authenticated
   },
-  getUserData: (state) => {
-    return state.auth.userData
+  getUserDetail (state) {
+    return state.userDetail
   },
-  getBrand: (state) => {
-    return state.brand
+  getToken (state) {
+    return state.token
   },
-  getWallet: (state) => {
-    return state.wallet
+  getHeader (state) {
+    return state.headers
+  },
+  getCategoryId (state) {
+    return state.categoryId
+  },
+  getLevelId (state) {
+    return state.levelId
   }
 }
