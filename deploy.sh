@@ -1,3 +1,3 @@
 git add .
 git commit -m "feat(): add brikcs interface"
-git push
+git push -u origin dev
