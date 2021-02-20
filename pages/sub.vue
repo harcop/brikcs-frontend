@@ -1,6 +1,23 @@
 <template>
   <div>
     <v-row>
+      <template
+        v-if="!games.length"
+      >
+        <v-col
+          v-for="n in 5"
+          :key="n"
+          cols="6"
+          md="2"
+          sm="3"
+        >
+          <v-skeleton-loader
+            type="list-item-three-line"
+            v-bind="attrs"
+            style="border-radius: 7px; background: #262C3C;"
+          />
+        </v-col>
+      </template>
       <v-col
         v-for="(game, index) in games"
         :key="index"
@@ -38,7 +55,10 @@ export default {
   middleware: 'auth',
   data () {
     return {
-      games: [
+      attrs: {
+        loading: true
+      },
+      Oldgames: [
         {
           title: 'hello-world',
           status: true
@@ -60,6 +80,7 @@ export default {
           status: false
         }
       ],
+      games: [],
       categoryId: ''
     }
   },
@@ -94,5 +115,8 @@ export default {
 .game-card {
   border-radius: 5px;
   background: red;
+}
+.v-skeleton-loader__bone {
+  background: #262C3C !important;
 }
 </style>

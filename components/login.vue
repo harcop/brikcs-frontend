@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span @click="login()">Sign with <i class="fa fa-google" />oogle</span>
+    <span @click="login()">Sign in with <i class="fa fa-google" />oogle</span>
     <div />
   </div>
 </template>

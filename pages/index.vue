@@ -12,6 +12,24 @@
         </v-col> -->
         <v-col>
           <v-row>
+            <template
+              v-if="!games.length"
+            >
+              <v-col
+                v-for="n in 5"
+                :key="n"
+                md="4"
+                xs="12"
+                sm="6"
+                cols="12"
+              >
+                <v-skeleton-loader
+                  type="article"
+                  v-bind="attrs"
+                  style="border-radius: 7px; background: #262C3C;"
+                />
+              </v-col>
+            </template>
             <v-col
               v-for="(game, index) in games"
               :key="index"
@@ -65,8 +83,22 @@
     </div>
     <div>
       <div class="notify-card mt-10 pa-5" style="background: #272c3c; color: #5d698f; border-radius:5px">
-        <p>Brikcs Academy is an online developer builder: we provide tutorials and coding challenges to help newbies get their hands dirty quickly <i class="fa fa-code" /><br> The industry grows every minute and we are limited by the information we are exposed to which is why we make available a platform that developers can come and see all in one what new technology is trending <i class="fa fa-code" /><br> As we build the platfrom using our known tools we plan to make it also make this available to experienced developers out there to help us build the community and make it grow better <i class="fa fa-code" /><br> </p>
+        <p>Brikcs Academy is an online developer builder: we provide tutorials and coding challenges to help newbies get their hands dirty quickly <i class="fa fa-code" /><br><br>The industry grows every minute and we are limited by the information we are exposed to which is why we make available a platform that developers can come and see all in one what new technology is trending <i class="fa fa-code" /><br><br> As we build the platfrom using our known tools we plan to make it also make this available to experienced developers out there to help us build the community and make it grow better <i class="fa fa-code" /><br> </p>
       </div>
+    </div>
+    <div>
+      <v-row justify="center">
+        <v-dialog
+          v-model="dialog"
+          max-width="290"
+        >
+          <v-card>
+            <div class="d-flex justify-center align-center">
+              <span>Please Sign in</span>
+            </div>
+          </v-card>
+        </v-dialog>
+      </v-row>
     </div>
   </div>
 </template>
@@ -75,8 +107,12 @@
 export default {
   data () {
     return {
+      dialog: false,
+      attrs: {
+        loading: true
+      },
       col: 'red',
-      games: [
+      Oldgames: [
         {
           name: 'Basic',
           mode: 'Easy',
@@ -112,7 +148,9 @@ export default {
           lastPlayed: 'few minute ago',
           status: 'close'
         }
-      ]
+      ],
+      games: [],
+      authenticated: false
     }
   },
   fetch () {
@@ -128,8 +166,13 @@ export default {
       return colorMode[mode.toLowerCase()]
     },
     navigateRoute (id) {
-      this.$store.commit('setCategoryId', { categoryId: id })
-      this.$router.push('/sub')
+      this.authenticated = this.$store.getters.getAuth
+      if (!this.authenticated) {
+        this.dialog = true
+      } else {
+        this.$store.commit('setCategoryId', { categoryId: id })
+        this.$router.push('/sub')
+      }
     },
     loadCategory () {
       const url = '/category/view'
@@ -151,5 +194,8 @@ export default {
 .center-flex {
   display: flex;
   justify-content: center;
+}
+.v-skeleton-loader__article {
+  background: #262C3C !important;
 }
 </style>

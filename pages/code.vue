@@ -4,11 +4,14 @@
     <div class="main_c">
       <v-row>
         <v-col cols="12" md="6">
-          <div class="bar-card">
-            Question
+          <div class="bar-card d-flex justify-space-between">
+            <div>Question</div>
+            <div class="dotStatus">
+              <i class="fa fa-circle" :style="{color: solutionStatusColor}" />
+            </div>
           </div>
           <div class="prompt-card pa-3">
-            <div>Title:  {{ question.title }}</div>
+            <div><span style="font-weight: bold">{{ question.title.toUpperCase() }}</span></div>
             <div class="question-body my-5">
               {{ question.questionBody }}
             </div>
@@ -52,7 +55,7 @@
               Javascript
             </div>
             <div>
-              <span class="codeRunner" @click="runCode()">Run</span>
+              <span class="codeRunner py-2 px-5" @click="runCode()">Run</span>
             </div>
           </div>
           <div class="prompt-card">
@@ -160,18 +163,19 @@ export default {
       test_console_active: 'console-active',
       console_console_active: '',
       levelId: '',
+      categoryId: '',
       consoleColor: 'green',
       totalTestCasesPassed: 0,
       totalTestCases: 0,
-      testCode: ''
+      testCode: '',
+      solutionStatusColor: false
     }
   },
   async fetch () {
     this.levelId = this.$store.getters.getLevelId
+    this.categoryId = this.$store.getters.getCategoryId
     this.headers = this.$store.getters.getHeader
     await this.getLevelQuestion()
-    console.log(this.editor, 'editore')
-    // this.loadIDE()
   },
   methods: {
     switchConsoleTab (tab) {
@@ -197,11 +201,13 @@ export default {
         functionBody: text,
         levelId: this.levelId
       }, { headers: this.headers })
-        .then((response) => {
-          console.log(response)
-          this.codeOutput = response.data
-          this.totalTestCasesPassed = this.codeOutput.response.passes
-          this.totalTestCases = this.codeOutput.response.tests.length
+        .then((result) => {
+          const { data } = result
+          const { response } = data
+          this.codeOutput = data
+          this.totalTestCasesPassed = response.passes
+          this.totalTestCases = response.tests.length
+          this.solutionStatusColor = response.status ? 'green' : 'red'
         })
         .catch((err) => {
           const { response } = err
@@ -221,9 +227,10 @@ export default {
           const { data } = result
           const { response } = data
           this.question = response
-          const { id: levelId } = response
+          const { id: levelId, categoryId } = response
           return this.$axios.post(urlLoad, {
             levelId,
+            categoryId,
             queryType: 'load'
           }, { headers: this.headers })
         })
@@ -231,12 +238,17 @@ export default {
           const { data } = result
           const { response } = data
           this.testCode = response.functionBody
+          this.solutionStatusColor = response.status ? 'green' : 'red'
         })
         .finally(() => {
           this.loadIDE(this.testCode)
         })
     },
     loadIDE (textCode) {
+      // eslint-disable-next-line no-undef
+      if (!CodeMirror) {
+        this.$router.push('/')
+      }
       const editCode = this.$refs.editor
       // eslint-disable-next-line no-undef
       this.editor = CodeMirror.fromTextArea(editCode, {
@@ -313,5 +325,7 @@ export default {
 }
 .codeRunner {
   cursor: pointer;
+  background: #262C3C;
+  border-radius: 5px;
 }
  </style>

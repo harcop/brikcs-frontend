@@ -1,3 +1,3 @@
 git add .
-git commit -m "refactor(): attach code IDE to finally"
+git commit -m "feat(): add loader and login pop up warning"
 git push -u origin dev
