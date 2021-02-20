@@ -162,7 +162,8 @@ export default {
       levelId: '',
       consoleColor: 'green',
       totalTestCasesPassed: 0,
-      totalTestCases: 0
+      totalTestCases: 0,
+      testCode: ''
     }
   },
   async fetch () {
@@ -229,8 +230,10 @@ export default {
         .then((result) => {
           const { data } = result
           const { response } = data
-          const textCode = response.functionBody
-          this.loadIDE(textCode)
+          this.testCode = response.functionBody
+        })
+        .finally(() => {
+          this.loadIDE(this.testCode)
         })
     },
     loadIDE (textCode) {

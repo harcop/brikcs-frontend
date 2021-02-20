@@ -1,3 +1,3 @@
 git add .
-git commit -m "feat(): add test passed count"
+git commit -m "refactor(): attach code IDE to finally"
 git push -u origin dev
