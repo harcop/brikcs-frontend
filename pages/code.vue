@@ -72,7 +72,7 @@
           </div>
           <div class="prompt-card console pa-3">
             <div v-if="test_console_active" class="test-console">
-              <div>2/2 test cases passed</div>
+              <div>{{ totalTestCasesPassed }}/{{ totalTestCases }} test cases passed</div>
               <div class="test-case">
                 <div>
                   <v-expansion-panels>
@@ -160,7 +160,9 @@ export default {
       test_console_active: 'console-active',
       console_console_active: '',
       levelId: '',
-      consoleColor: 'green'
+      consoleColor: 'green',
+      totalTestCasesPassed: 0,
+      totalTestCases: 0
     }
   },
   async fetch () {
@@ -197,6 +199,8 @@ export default {
         .then((response) => {
           console.log(response)
           this.codeOutput = response.data
+          this.totalTestCasesPassed = this.codeOutput.response.passes
+          this.totalTestCases = this.codeOutput.response.tests.length
         })
         .catch((err) => {
           const { response } = err
