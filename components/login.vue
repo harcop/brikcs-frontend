@@ -21,15 +21,15 @@ export default {
     firebaseInit () {
     // eslint-disable-next-line no-undef
       if (!firebase.apps.length) {
-      // eslint-disable-next-line no-undef
-        firebase.initializeApp(process.env.firebaseConfig)
+        const config = JSON.parse(process.env.firebaseConfig)
+        // eslint-disable-next-line no-undef
+        firebase.initializeApp(config)
       }
       // eslint-disable-next-line no-undef
       this.provider = new firebase.auth.GoogleAuthProvider()
     },
     login () {
       this.firebaseInit()
-      console.log(this.provider, 'provider is mad o')
       this.googleSignInPopup(this.provider)
     },
     googleSignInPopup (provider) {

@@ -83,10 +83,12 @@ export default {
       console.log(this.authenticated, this.userDetail, 'data everywhere')
     },
     logout () {
+      const config = JSON.parse(process.env.firebaseConfig)
+      console.log(config, 'key')
       // eslint-disable-next-line no-undef
       if (!firebase.apps.length) {
-      // eslint-disable-next-line no-undef
-        firebase.initializeApp(process.env.firebaseConfig)
+        // eslint-disable-next-line no-undef
+        firebase.initializeApp(config)
       }
       // eslint-disable-next-line no-undef
       firebase.auth().signOut().then(() => {
