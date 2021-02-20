@@ -7,7 +7,7 @@
         cols="6"
         md="2"
         sm="3"
-        @click="navigateRoute()"
+        @click="navigateRoute(game.id)"
       >
         <div>
           <div class="game-card d-flex justify-center py-3 px-3" style="position:relative; background: #262C3C;">
@@ -25,7 +25,7 @@
             </div>
           </div>
           <div class="d-flex justify-center" style="color: #eaeaea">
-            <p>{{ game.name }}</p>
+            <p>{{ game.title }}</p>
           </div>
         </div>
       </v-col>
@@ -40,23 +40,23 @@ export default {
     return {
       games: [
         {
-          name: 'hello-world',
+          title: 'hello-world',
           status: true
         },
         {
-          name: 'Array',
+          title: 'Array',
           status: false
         },
         {
-          name: 'Hash',
+          title: 'Hash',
           status: true
         },
         {
-          name: 'Include',
+          title: 'Include',
           status: false
         },
         {
-          name: 'Pop',
+          title: 'Pop',
           status: false
         }
       ],
@@ -64,15 +64,20 @@ export default {
     }
   },
   fetch () {
+    if (this.$store.getters.getCategoryId === '') {
+      this.$router.push('/')
+    }
     this.categoryId = this.$store.getters.getCategoryId
     this.fetchCategoryLevel()
   },
   methods: {
-    navigateRoute () {
+    navigateRoute (levelId) {
+      console.log(levelId, 'moving levelId...')
+      this.$store.commit('setLevelId', { levelId })
       this.$router.push('/code')
     },
     fetchCategoryLevel () {
-      const url = `http://localhost:3280/api/level/view?category=${this.categoryId}`
+      const url = `/level/view-user-level/${this.categoryId}`
       const headers = this.$store.getters.getHeader
       this.$axios.get(url, { headers })
         .then((result) => {

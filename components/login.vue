@@ -47,7 +47,7 @@ export default {
           this.$store.commit('setUserDetail', { userDetail: user.providerData[0] })
           console.log(user, 'user')
           const { email } = user
-          const url = 'http://localhost:3280/api/user/load-user'
+          const url = '/user/load-user'
           return this.$axios.post(url, { email })
         })
         .then((result) => {

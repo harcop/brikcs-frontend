@@ -8,22 +8,22 @@
             Question
           </div>
           <div class="prompt-card pa-3">
-            <div>{{ question.title }}</div>
+            <div>Title:  {{ question.title }}</div>
             <div class="question-body my-5">
-              {{ question.body }}
+              {{ question.questionBody }}
             </div>
-            <div v-if="question.tests">
-              <div v-for="(test, index) in question.tests" :key="index" class="question-test pa-3 my-5">
+            <div v-if="question.testCases">
+              <div v-for="(test, index) in question.testCases" :key="index" class="question-test pa-3 my-5">
                 <div class="test-input px-3">
                   <div>sample input</div>
                   <div style="background: #262C3C; border-radius:3px" class="pa-3">
-                    {{ test.input }}
+                    {{ test.input.join(',') }}
                   </div>
                 </div>
                 <div class="test-output px-3">
                   <div>sample output</div>
                   <div style="background: #262C3C; border-radius:3px" class="pa-3">
-                    {{ test.output }}
+                    {{ test.expected }}
                   </div>
                 </div>
               </div>
@@ -56,7 +56,7 @@
             </div>
           </div>
           <div class="prompt-card">
-            <textarea id="editor" ref="editor" v-model="editor" />
+            <textarea id="editor" ref="editor" />
           </div>
         </v-col>
       </v-row>
@@ -100,7 +100,7 @@
                           </div>
                           <div>Test Input</div>
                           <div class="pa-3 test-card">
-                            {{ test.input }}
+                            {{ test.input.join('') }}
                           </div>
                         </div>
                       </v-expansion-panel-content>
@@ -110,7 +110,7 @@
               </div>
             </div>
             <div v-if="console_console_active" class="console-console pa-2">
-              <pre class="console.terminal-text" style="color: gray; font-size: 12px">{{ codeOutput.response.logs.join('\n') }}</pre>
+              <pre class="console.terminal-text" :style="{color: consoleColor}" style="font-size: 12px">{{ codeOutput.response.logs.join('\n') }}</pre>
             </div>
           </div>
         </v-col>
@@ -124,17 +124,17 @@ export default {
   middleware: 'auth',
   data () {
     return {
-      editor: '//code below\nfunction nextSq(sequence){\n\t// your code here \n}',
+      editor: '',
       codeCode: 'code',
       question: {
         title: 'Even Number Sequence',
-        level: 'easy',
-        body: 'Tara new school games are fun and weird, they make her think and she is already loosing interest; Help Tara find the answer to the game. What is the next number in the sequence?',
+        mode: 'easy',
+        questionBody: 'Tara new school games are fun and weird, they make her think and she is already loosing interest; Help Tara find the answer to the game. What is the next number in the sequence?',
         hints: [ // hinta are going to be array
           'loop',
           'even'
         ],
-        tests: [
+        testCases: [
           {
             input: [2, 4, 6],
             output: 8
@@ -159,33 +159,16 @@ export default {
       },
       test_console_active: 'console-active',
       console_console_active: '',
-      levelId: ''
+      levelId: '',
+      consoleColor: 'green'
     }
   },
-  fetch () {
+  async fetch () {
     this.levelId = this.$store.getters.getLevelId
-  },
-  mounted () {
-    const editCode = this.$refs.editor
-    // eslint-disable-next-line no-undef
-    this.editor = CodeMirror.fromTextArea(editCode, {
-      lineNumbers: true,
-      mode: 'javascript',
-      theme: 'dracula',
-      lineWrapping: true,
-      styleActiveLine: true,
-      matchBrackets: true,
-      indentUnit: 4,
-      indentWithTabs: true,
-      autoCloseTags: true,
-      autoCloseBrackets: true,
-      matchTags: true,
-      extraKeys: {
-        'Ctrl-Space': 'autocomplete'
-      },
-      foldGutter: true,
-      gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter']
-    })
+    this.headers = this.$store.getters.getHeader
+    await this.getLevelQuestion()
+    console.log(this.editor, 'editore')
+    // this.loadIDE()
   },
   methods: {
     switchConsoleTab (tab) {
@@ -205,23 +188,69 @@ export default {
     },
     runCode () {
       const text = this.editor.getValue()
-      const url = 'http://localhost:3280/home'
-      console.log(this.editor.getValue())
+      this.consoleColor = 'green'
+      const url = '/challenge/solve'
       this.$axios.post(url, {
-        code: text,
-        codeName: 'nextSq'
-      })
+        functionBody: text,
+        levelId: this.levelId
+      }, { headers: this.headers })
         .then((response) => {
           console.log(response)
           this.codeOutput = response.data
         })
         .catch((err) => {
+          const { response } = err
+          this.codeOutput = response.data
+          this.consoleColor = 'red'
+          this.switchConsoleTab(2)
           console.log(err.response, 'error is here')
         })
     },
     getLevelQuestion () {
-      const url = 'http://localhost:3280/api/category/view'
+      // load-user-code;
+      const url = `/level/view?levelId=${this.levelId}`
+      const urlLoad = '/user-level/load-user-level'
 
+      this.$axios.get(url, { headers: this.headers })
+        .then((result) => {
+          const { data } = result
+          const { response } = data
+          this.question = response
+          const { id: levelId } = response
+          return this.$axios.post(urlLoad, {
+            levelId,
+            queryType: 'load'
+          }, { headers: this.headers })
+        })
+        .then((result) => {
+          const { data } = result
+          const { response } = data
+          const textCode = response.functionBody
+          this.loadIDE(textCode)
+        })
+    },
+    loadIDE (textCode) {
+      const editCode = this.$refs.editor
+      // eslint-disable-next-line no-undef
+      this.editor = CodeMirror.fromTextArea(editCode, {
+        lineNumbers: true,
+        mode: 'javascript',
+        theme: 'dracula',
+        lineWrapping: true,
+        styleActiveLine: true,
+        matchBrackets: true,
+        indentUnit: 4,
+        indentWithTabs: true,
+        autoCloseTags: true,
+        autoCloseBrackets: true,
+        matchTags: true,
+        extraKeys: {
+          'Ctrl-Space': 'autocomplete'
+        },
+        foldGutter: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter']
+      })
+      this.editor.setValue(textCode)
     }
   }
 }

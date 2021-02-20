@@ -132,7 +132,7 @@ export default {
       this.$router.push('/sub')
     },
     loadCategory () {
-      const url = 'http://localhost:3280/api/category/view'
+      const url = '/category/view'
       this.$axios.get(url)
         .then((result) => {
           const { data } = result

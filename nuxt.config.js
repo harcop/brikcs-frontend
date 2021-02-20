@@ -64,10 +64,14 @@ export default {
       messagingSenderId: '1081404799649',
       appId: '1:1081404799649:web:c5da801a4e2862cbf70ee0',
       measurementId: 'G-WTLD8RZWQ7'
-    }
+    },
+    BASE_URL: 'https://brikcs.herokuapp.com/api',
+    BASE_URL_LOC: 'http://localhost:3280/api'
   },
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {},
+  axios: {
+    baseURL: 'https://brikcs.herokuapp.com/api'
+  },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
