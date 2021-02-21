@@ -13,7 +13,7 @@
           <div class="prompt-card pa-3">
             <div><span style="font-weight: bold">{{ question.title.toUpperCase() }}</span></div>
             <div class="question-body my-5">
-              {{ question.questionBody }}
+              <p v-html="question.questionBody" />
             </div>
             <div v-if="question.testCases">
               <div v-for="(test, index) in question.testCases" :key="index" class="question-test pa-3 my-5">
