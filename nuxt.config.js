@@ -62,7 +62,7 @@ export default {
   },
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: 'http://localhost:3280/api'
+    baseURL: 'https://brikcs.herokuapp.com/api'
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
