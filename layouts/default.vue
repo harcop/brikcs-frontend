@@ -1,89 +1,124 @@
 <template>
-  <v-app dark>
-    <v-navigation-drawer
-      v-model="drawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      fixed
-      app
-    >
-      <v-list>
-        <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :to="item.to"
-          router
-          exact
-        >
-          <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-app-bar
-      :clipped-left="clipped"
-      fixed
-      app
-    >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+  <v-app>
+    <div class="d-flex justify-space-between nav-bar-header">
+      <div class="d-flex align-center" style="color: #3B4562">
+        <div class="d-flex justify-center pa-3 " style="background:#2C344C; width: 40px;">
+          <i class="fa fa-align-center" />
+        </div>
+        <span class="ml-3" style="font-weight:bold">Brikcs Acad</span>
+      </div>
 
-      <v-toolbar-title v-text="title" />
-      <v-spacer />
-    </v-app-bar>
+      <div class="mt-2 mr-5 menu_attr" style="color:#585D7B">
+        <template v-if="authenticated">
+          <div class="d-flex align-center">
+            <span class="">Welcome {{ userDetail.displayName.split(" ")[0] }}</span>
+            <div class="mr-3 ml-1 mt-1">
+              <img :src="userDetail.photoURL" width="15px" style="border-radius:100px">
+            </div>
+            <v-menu
+              class="v-main-menu"
+              bottom
+            >
+              <template #activator="{ on, attrs }">
+                <span
+                  v-bind="attrs"
+                  v-on="on"
+                >
+
+                  <i class="fa fa-bars" />
+                  Menu</span>
+              </template>
+              <v-list class="menu-list">
+                <v-list-item>
+                  <nuxt-link to="/">
+                    <v-list-item-title>Home</v-list-item-title>
+                  </nuxt-link>
+                </v-list-item>
+                <v-list-item @click="logout()">
+                  <v-list-item-title>Logout</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </div>
+        </template>
+        <template v-else>
+          <!-- <span @click="login()">Login</span> -->
+          <login @login="fetchData" />
+        </template>
+      </div>
+    </div>
     <v-main>
-      <v-container>
+      <div class="main_container">
         <nuxt />
-      </v-container>
+      </div>
     </v-main>
-    <v-navigation-drawer
-      v-model="rightDrawer"
-      :right="right"
-      temporary
-      fixed
-    >
-      <v-list>
-        <v-list-item @click.native="right = !right">
-          <v-list-item-action>
-            <v-icon light>
-              mdi-repeat
-            </v-icon>
-          </v-list-item-action>
-          <v-list-item-title>Switch drawer (click me)</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-footer
-      :absolute="!fixed"
-      app
-    >
-      <span>&copy; {{ new Date().getFullYear() }}</span>
-    </v-footer>
   </v-app>
 </template>
 
 <script>
+import login from '~/components/login.vue'
 export default {
+  components: {
+    login
+  },
   data () {
     return {
-      clipped: false,
-      drawer: false,
-      fixed: false,
-      items: [
-        {
-          icon: 'mdi-apps',
-          title: 'Dashboard',
-          to: '/'
-        }
-      ],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'Maya SMS'
+      userDetail: {},
+      authenticated: false
+    }
+  },
+  fetch () {
+    this.fetchData()
+  },
+  methods: {
+    getUserDetail () {
+      this.userDetail = this.$store.getters.getUserDetail
+    },
+    getAuthentication () {
+      this.authenticated = this.$store.getters.getAuth
+    },
+    fetchData () {
+      this.getUserDetail()
+      this.getAuthentication()
+      console.log(this.authenticated, this.userDetail, 'data everywhere')
+    },
+    logout () {
+      const config = JSON.parse(process.env.firebaseConfig)
+      console.log(config, 'key')
+      // eslint-disable-next-line no-undef
+      if (!firebase.apps.length) {
+        // eslint-disable-next-line no-undef
+        firebase.initializeApp(config)
+      }
+      // eslint-disable-next-line no-undef
+      firebase.auth().signOut().then(() => {
+        // Sign-out successful.
+        this.$store.commit('removeAuth')
+        this.fetchData()
+        this.$router.push('/')
+      }).catch((error) => {
+        // An error happened.
+        console.log(error)
+      })
     }
   }
 }
 </script>
+
+<style>
+.v-application {
+  background: #1F2330 !important;
+}
+.nav-bar-header {
+  background: #272D3D
+}
+.main_container {
+  padding: 20px;
+}
+.menu_attr {
+  cursor: pointer;
+}
+.v-main-menu {
+  z-index: 25 !important;
+}
+</style>
